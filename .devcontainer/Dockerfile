@@ -1,32 +1,6 @@
-# Use the [Choice] comment to indicate option arguments that should appear in VS Code UX. Use a comma separated list.
-#
-# [Choice] Debian OS version: bullseye, buster
-ARG VARIANT="bullseye"
-FROM buildpack-deps:${VARIANT}-curl
+FROM mcr.microsoft.com/vscode/devcontainers/base:ubuntu-22.04
 
-# Use the [Option] comment to specify true/false arguments that should appear in VS Code UX
-#
-# [Option] Install zsh
-ARG INSTALL_ZSH="true"
-# [Option] Upgrade OS packages to their latest versions
-ARG UPGRADE_PACKAGES="false"
-# Install needed packages and setup non-root user. Use a separate RUN statement to add your own dependencies.
-ARG USERNAME=vscode
-ARG USER_UID=1000
-ARG USER_GID=$USER_UID
-# Install needed packages and setup non-root user. Use a separate RUN statement to add your own dependencies.
-COPY library-scripts/*.sh library-scripts/*.env /tmp/library-scripts/
-RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
-    && /bin/bash /tmp/library-scripts/common-debian.sh "${INSTALL_ZSH}" "${USERNAME}" "${USER_UID}" "${USER_GID}" "${UPGRADE_PACKAGES}" "true" "true" \
-    #
-    # ****************************************************************************
-    # * TODO: Add any additional OS packages you want included in the definition *
-    # * here. We want to do this before cleanup to keep the "layer" small.       *
-    # ****************************************************************************
-    # && apt-get -y install --no-install-recommends <your-package-list-here> \
-    #
-    && apt-get autoremove -y && apt-get clean -y && rm -rf /var/lib/apt/lists/* /tmp/library-scripts
-
-# [Optional] Uncomment this section to install additional OS packages.
-# RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
-#     && apt-get -y install --no-install-recommends <your-package-list-here>
+# Adding the PostgreSQL repository so we can install postgresql-client v15
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+RUN curl https://www.postgresql.org/media/keys/ACCC4CF8.asc | gpg --dearmor | tee /etc/apt/trusted.gpg.d/apt.postgresql.org.gpg >/dev/null
+RUN sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
