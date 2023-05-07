@@ -1,3 +1,4 @@
+version: '3'
 services:
   postgres:
     image: 'postgres:14'
@@ -11,4 +12,4 @@ services:
       - 'database:/var/lib/postgresql/data'
 
 volumes:
-  database:/pgdata
+  database
