@@ -1,0 +1,48 @@
+// For format details, see https://containers.dev/implementors/json_reference/.
+{
+  "name": "Metrics Dockerfile",
+  "dockerComposeFile": [
+    "./docker-compose.dev.yml"
+  ],
+  "service": "app",
+  "workspaceFolder": "/home/metrics-dev/app",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "mtxr.sqltools",
+        "mtxr.sqltools-driver-pg"
+      ],
+      "sqltools.connections": [
+        {
+          "previewLimit": 50,
+          "server": "postgres",
+          "port": 5432,
+          "driver": "PostgreSQL",
+          "name": "development",
+          "database": "postgres",
+          "username": "postgres",
+          "password": ""
+        }
+      ]
+    }
+  },
+  "forwardPorts": [
+    3000,
+    5432
+  ],
+//   "initializeCommand": [
+//     "/bin/bash",
+//     ".devcontainer/pre_create.sh"
+//   ],
+//   "postCreateCommand": [
+//     "/bin/bash",
+//     ".devcontainer/post_create.sh"
+//   ],
+  "remoteUser": "metrics-dev", // see https: //aka.ms/vscode-remote/containers/non-root
+  "shutdownAction": "stopCompose", // stop compose when quitting
+  "overrideCommand": true, // override the commands in the compose file
+  "containerEnv": {
+    
+  }
+}
