@@ -1,11 +1,9 @@
 // For format details, see https://containers.dev/implementors/json_reference/.
 {
   "name": "Metrics Dockerfile",
-  "dockerComposeFile": [
-    "./docker-compose.dev.yml"
-  ],
+  "dockerComposeFile": "docker-compose.yml",
   "service": "app",
-  "workspaceFolder": "/home/metrics-dev/app",
+  "workspaceFolder": "/workspace",
   "customizations": {
     "vscode": {
       "extensions": [
@@ -27,10 +25,10 @@
       ]
     }
   },
-  "forwardPorts": [
-    3000,
-    5432
-  ],
+//   "forwardPorts": [
+//     3000,
+//     5432
+//   ],
 //   "initializeCommand": [
 //     "/bin/bash",
 //     ".devcontainer/pre_create.sh"
@@ -39,7 +37,7 @@
 //     "/bin/bash",
 //     ".devcontainer/post_create.sh"
 //   ],
-  "remoteUser": "metrics-dev", // see https: //aka.ms/vscode-remote/containers/non-root
+  "remoteUser": "vscode", // see https: //aka.ms/vscode-remote/containers/non-root
   "shutdownAction": "stopCompose", // stop compose when quitting
   "overrideCommand": true, // override the commands in the compose file
   "containerEnv": {
