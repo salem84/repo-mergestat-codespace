@@ -1,12 +1,13 @@
 {
   "name": "Your Project Name",
   "dockerComposeFile": "docker-compose.yml",
-  "workspaceFolder": "/workspace",
+  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
   "service": "app",
-  "containerEnv": {
-    "POSTGRES_HOST": "localhost"
-  },
+  // "containerEnv": {
+  //   "POSTGRES_HOST": "localhost"
+  // },
   "remoteUser": "vscode",
+
   // "features": {
   //   "ghcr.io/devcontainers/features/git:1": {
   //     "version": "latest"
@@ -29,18 +30,20 @@
         "mtxr.sqltools",
         "mtxr.sqltools-driver-pg"
       ],
-      "sqltools.connections": [
-        {
-          "previewLimit": 50,
-          "server": "postgres",
-          "port": 5432,
-          "driver": "PostgreSQL",
-          "name": "mergestat",
-          "database": "postgres",
-          "username": "postgres",
-          "password": "postgres"
-        }
-      ]
+      "settings": {
+        "sqltools.connections": [
+          {
+            "previewLimit": 50,
+            "server": "postgres",
+            "port": 5432,
+            "driver": "PostgreSQL",
+            "name": "mergestat",
+            "database": "postgres",
+            "username": "postgres",
+            "password": "postgres"
+          }
+        ]
+      }
     }
   },
 
