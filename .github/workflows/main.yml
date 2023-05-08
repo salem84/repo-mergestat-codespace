@@ -25,10 +25,13 @@ jobs:
 
       - name: Install
         run: npm ci
+        working-directory: scripts/ci
         
       - name: Start containers
         run: docker-compose -f "docker-compose.yaml" up
+        working-directory: scripts/ci
         
       - name: Stop containers
         if: always()
         run: docker-compose -f "docker-compose.yaml" down
+        working-directory: scripts/ci
