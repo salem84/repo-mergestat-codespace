@@ -1,2 +1,4 @@
-mkdir /pgdata
-touch /pgdata/leggimi.txt 
+#!/bin/bash
+
+mkdir $(pwd)/pgdata
+touch $(pwd)/pgdata/leggimi.txt 
