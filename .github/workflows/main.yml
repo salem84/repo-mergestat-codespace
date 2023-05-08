@@ -19,10 +19,10 @@ jobs:
 
       - name: Setup node
         uses: actions/setup-node@v3
-        working-directory: scripts/ci
         with:
           node-version: 16.13.x
           cache: npm
+          cache-dependency-path:: scripts/ci/package-lock.json
 
       - name: Install
         run: npm ci
