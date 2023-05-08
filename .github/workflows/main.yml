@@ -29,7 +29,7 @@ jobs:
         working-directory: scripts/ci
         
       - name: Start containers
-        run: docker-compose -f "docker-compose.yaml" up
+        run: docker-compose -f "docker-compose.yaml" up -d
         working-directory: scripts/ci
         
       - name: Stop containers
