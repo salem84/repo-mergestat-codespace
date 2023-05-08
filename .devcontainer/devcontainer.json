@@ -1,22 +1,26 @@
 {
   "name": "Your Project Name",
   "dockerComposeFile": "docker-compose.yml",
+  "workspaceFolder": "/workspace",
   "service": "app",
-  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
-  "features": {
-    "ghcr.io/devcontainers/features/git:1": {
-      "version": "latest"
-    },
-    "ghcr.io/devcontainers/features/common-utils:2": {
-      "username": "vscode",
-      "userUid": 1000,
-      "userGid": 1000,
-      "installZsh": true,
-      "installOhMyZsh": true,
-      "configureZshAsDefaultShell": true,
-      "upgradePackages": true
-    }
+  "containerEnv": {
+    "POSTGRES_HOST": "localhost"
   },
+  "remoteUser": "vscode",
+  // "features": {
+  //   "ghcr.io/devcontainers/features/git:1": {
+  //     "version": "latest"
+  //   },
+  //   "ghcr.io/devcontainers/features/common-utils:2": {
+  //     "username": "vscode",
+  //     "userUid": 1000,
+  //     "userGid": 1000,
+  //     "installZsh": true,
+  //     "installOhMyZsh": true,
+  //     "configureZshAsDefaultShell": true,
+  //     "upgradePackages": true
+  //   }
+  // },
 
   // Configure tool-specific properties.
   "customizations": {
