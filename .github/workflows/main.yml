@@ -12,6 +12,23 @@ jobs:
   start:
     runs-on: ubuntu-latest
     
+    # services:
+    #   postgres:
+    #     image: postgres
+
+    #     env:
+    #       POSTGRES_PASSWORD: postgres
+    #       POSTGRES_USER: postgres
+    #       POSTGRES_DB: postgres
+
+    #     options: >-
+    #       --health-cmd pg_isready
+    #       --health-interval 10s
+    #       --health-timeout 5s
+    #       --health-retries 5
+    #     ports:
+    #       - 5432:5432
+
     
     steps:
       - name: Checkout
@@ -30,6 +47,10 @@ jobs:
         
       - name: Start containers
         run: docker-compose -f "docker-compose.yaml" up -d
+        working-directory: scripts/ci
+
+      - name: Run script
+        run: npm start -- ../../config.json localhost
         working-directory: scripts/ci
         
       - name: Stop containers
