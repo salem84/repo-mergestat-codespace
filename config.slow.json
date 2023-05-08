@@ -1,0 +1,12 @@
+{
+    "repositories": [
+        {
+            "url": "https://github.com/mergestat/mergestat",
+            "syncs": [ "Git Commits", "Git Files" ]
+        },
+        {
+            "url": "https://github.com/mergestat/mergestat-lite",
+            "syncs": [ "Git Commits", "Git Files" ]
+        } 
+    ]
+}

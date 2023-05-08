@@ -1,0 +1,12 @@
+{
+    "repositories": [
+        {
+            "url": "https://github.com/DotNetCodeIT/spid-dotnet-sdk",
+            "syncs": [ "Git Commits", "Git Files" ]
+        },
+        {
+            "url": "https://github.com/xmasdev-2022/xmaze-api",
+            "syncs": [ "Git Files"]
+        } 
+    ]
+}

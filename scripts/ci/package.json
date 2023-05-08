@@ -1,0 +1,16 @@
+{
+  "name": "foo-ip",
+  "version": "0.0.1",
+  "scripts": {
+    "start": "node ./node_modules/ts-node/dist/bin.js index.ts"
+  },
+  "dependencies": {
+    "graphql": "^16.6.0",
+    "graphql-request": "^6.0.0",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.0.4"
+  },
+  "devDependencies": {
+    "@types/node": "^18.16.5"
+  }
+}
