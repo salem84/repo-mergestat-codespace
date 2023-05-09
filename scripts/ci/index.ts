@@ -31,7 +31,7 @@ const defaultGitSource = 'ReposCI';
 let graphQLClient : GraphQLClient;
 
 async function main() {
-  var configPath = process.argv[2];
+  let configPath = process.argv[2];
 
   if(!configPath) {
     console.error('ConfigPath is not valid: ' + configPath);
@@ -40,11 +40,12 @@ async function main() {
   console.log(configPath);
   const config : ConfigRoot = ConfigReader.read(configPath);
 
-  var endpoint = process.env[3];
+  let endpoint = process.argv[3];
+  console.log('Endpoint: ' + endpoint);
   if(!endpoint) {
     endpoint = defaultEndpoint;
   }
-  graphQLClient= new GraphQLClient(defaultEndpoint);
+  graphQLClient= new GraphQLClient(endpoint);
 
   await create(config.repositories);
   
