@@ -56,12 +56,18 @@ jobs:
       - name: Postgres Dump
         run: |
           docker exec -i postgres pg_dump -U postgres -F t postgres > backup_mergestat.dump
+          docker exec -i postgres pg_dump -U postgres -F t postgres | gzip > backup_mergestat.tar.gz
           ls -l
 
       - uses: actions/upload-artifact@v3
         with:
           name: pg-dump
           path: '**/backup_mergestat.dump'
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: pg-dump2
+          path: '**/backup_mergestat.tar.gz'
         
       - name: Stop containers
         if: always()
