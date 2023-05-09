@@ -61,7 +61,7 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: pg-dump
-          path: **/backup_mergestat.dump
+          path: '**/backup_mergestat.dump'
         
       - name: Stop containers
         if: always()
