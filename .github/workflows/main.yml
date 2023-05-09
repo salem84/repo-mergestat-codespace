@@ -46,11 +46,11 @@ jobs:
         working-directory: scripts/ci
         
       - name: Start containers
-        run: docker-compose -f "docker-compose.yaml" up -d
+        run: docker-compose -f "docker-compose.yaml" up -d --wait
         working-directory: scripts/ci
 
       - name: Run script
-        run: npm start -- ../../config.json localhost
+        run: npm start -- ../../config.json http://localhost:5433/graphql
         working-directory: scripts/ci
         
       - name: Stop containers
