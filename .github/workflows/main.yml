@@ -34,6 +34,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
+      - name: Start containers
+        run: docker-compose -f "docker-compose.yaml" up -d
+        working-directory: scripts/ci
+        
       - name: Setup node
         uses: actions/setup-node@v3
         with:
@@ -45,9 +49,6 @@ jobs:
         run: npm ci
         working-directory: scripts/ci
         
-      - name: Start containers
-        run: docker-compose -f "docker-compose.yaml" up -d --wait
-        working-directory: scripts/ci
 
       - name: Run script
         run: npm start -- ../../config.json http://localhost:5433/graphql
