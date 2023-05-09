@@ -37,7 +37,7 @@ jobs:
       - name: Start containers
         run: docker-compose -f "docker-compose.yaml" up -d
         working-directory: scripts/ci
-        
+
       - name: Setup node
         uses: actions/setup-node@v3
         with:
@@ -49,10 +49,17 @@ jobs:
         run: npm ci
         working-directory: scripts/ci
         
-
       - name: Run script
         run: npm start -- ../../config.json http://localhost:5433/graphql
         working-directory: scripts/ci
+
+      - name: Postgres Dump
+        run: docker exec -it postgres pg_dump -U postgres -F t postgres > backup_mergestat.dump
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: pg-dump
+          path: backup_mergestat.dump
         
       - name: Stop containers
         if: always()
