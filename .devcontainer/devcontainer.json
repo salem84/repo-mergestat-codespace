@@ -42,7 +42,7 @@
   // This can be used to network with other containers or the host.
   "forwardPorts": [5432],
 
-  "initializeCommand": ".devcontainer/pre-create.sh"
+  "initializeCommand": ".devcontainer/init.sh",
   // Use 'postCreateCommand' to run commands after the container is created.
-  //"postCreateCommand": ".devcontainer/boot.sh"
+  "postCreateCommand": ".devcontainer/post-create.sh"
 }
