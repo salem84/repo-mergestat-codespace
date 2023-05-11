@@ -1,5 +1,5 @@
-# FROM mcr.microsoft.com/vscode/devcontainers/base:ubuntu-22.04
-FROM debian:bullseye-slim
+FROM mcr.microsoft.com/vscode/devcontainers/base:ubuntu-22.04
+# FROM debian:bullseye-slim
 
 # Adding the PostgreSQL repository so we can install postgresql-client v15
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
