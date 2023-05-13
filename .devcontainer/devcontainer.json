@@ -7,7 +7,6 @@
   
   // Configure tool-specific properties.
   "features": {
-    "ghcr.io/devcontainers/features/docker-in-docker:2": {},
     "ghcr.io/devcontainers/features/github-cli:1": {}
   },
   "customizations": {
@@ -29,7 +28,7 @@
             "port": 5432,
             "driver": "PostgreSQL",
             "name": "mergestat",
-            "database": "postgres",
+            "database": "mergestat",
             "username": "postgres",
             "password": "postgres"
           }
