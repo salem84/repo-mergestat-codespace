@@ -1,5 +1,5 @@
 {
-  "name": "Your Project Name",
+  "name": "Mergestat Codespace Project",
   "dockerComposeFile": "docker-compose.yml",
   "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
   "service": "app",
