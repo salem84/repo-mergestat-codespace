@@ -59,7 +59,7 @@ async function main() {
   const total = config.repositories.length;
   do {
     const status = await getReposStatus();
-    console.log(status);
+    console.dir(status, { depth: null });
     console.log("Wait completing count repositories: " + total);
     syncCompleted = await checkSyncCompleted(status, total);
     await sleep(5000);

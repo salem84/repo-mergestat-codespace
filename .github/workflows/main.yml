@@ -50,13 +50,17 @@ jobs:
         working-directory: scripts/ci
         
       - name: Run script
-        run: npm start -- ../../config.json http://localhost:5433/graphql
+        run: npm start
+        env:
+          CONFIG_PATH: ../../config.json 
+          ENDPOINT: http://localhost:5433/graphql
+          PAT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
         working-directory: scripts/ci
 
       - name: Postgres Dump
         run: |
           docker exec -i postgres pg_dump -U postgres -Fc -Z 9 postgres > backup_mergestat.dump
-          ls -l
 
       - uses: actions/upload-artifact@v3
         with:
