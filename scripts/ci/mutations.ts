@@ -88,3 +88,9 @@ export const ENABLE_CONTAINER_SYNC_FOR_ALL = gql`
     bulkEnableSync(image: $imageId, provider: $providerId)
   }
 `;
+
+export const ADD_CREDENTIAL = gql`
+  mutation addToken($provider: UUID!, $token: String!, $type: String!, $username: String!) {
+    addToken(provider: $provider, token: $token, type: $type, username: $username)
+  }
+`;

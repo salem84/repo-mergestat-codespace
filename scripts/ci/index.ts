@@ -1,7 +1,12 @@
 // #!/usr/bin/env node
 
-import { request, gql, GraphQLClient } from 'graphql-request';
-import { GET_ALL_CONTAINER_IMAGES, GET_CONTAINER_SYNCS, GET_GIT_SOURCES_LIST, GET_REPOS_STATUS } from './queries';
+import { request, gql, GraphQLClient } from "graphql-request";
+import {
+  GET_ALL_CONTAINER_IMAGES,
+  GET_CONTAINER_SYNCS,
+  GET_GIT_SOURCES_LIST,
+  GET_REPOS_STATUS,
+} from "./queries";
 import {
   AddGitSourceMutation,
   AddRepoMutation,
@@ -21,87 +26,85 @@ import {
   ENABLE_CONTAINER_SYNC,
   ENABLE_CONTAINER_SYNC_FOR_ALL,
   SYNC_NOW,
+  ADD_CREDENTIAL,
 } from "./mutations";
-import { UUID } from 'crypto';
-import { ConfigReader, ConfigRepository, ConfigRoot } from './configuration';
+import { UUID } from "crypto";
+import { ConfigReader, ConfigRepository, ConfigRoot } from "./configuration";
 
 const defaultEndpoint = `https://salem84-orange-parakeet-rrww9ppqxhwwpg-5433.preview.app.github.dev/graphql`;
-const defaultGitSource = 'ReposCI';
+const defaultGitSource = "ReposCI";
 
-let graphQLClient : GraphQLClient;
+let graphQLClient: GraphQLClient;
 
 async function main() {
-  let configPath = process.argv[2];
+  let configPath = process.env.CONFIG_PATH;
 
-  if(!configPath) {
-    console.error('ConfigPath is not valid: ' + configPath);
+  if (!configPath) {
+    console.error("ConfigPath is not valid: " + configPath);
     process.exit(1);
   }
   console.log(configPath);
-  const config : ConfigRoot = ConfigReader.read(configPath);
+  const config: ConfigRoot = ConfigReader.read(configPath);
 
-  let endpoint = process.argv[3];
-  console.log('Endpoint: ' + endpoint);
-  if(!endpoint) {
+  let endpoint = process.env.ENDPOINT;
+  console.log("Endpoint: " + endpoint);
+  if (!endpoint) {
     endpoint = defaultEndpoint;
   }
-  graphQLClient= new GraphQLClient(endpoint);
+  graphQLClient = new GraphQLClient(endpoint);
 
   await create(config.repositories);
-  
+
   let syncCompleted = false;
   const total = config.repositories.length;
   do {
     const status = await getReposStatus();
     console.log(status);
-    console.log('Wait completing count repositories: ' + total);
+    console.log("Wait completing count repositories: " + total);
     syncCompleted = await checkSyncCompleted(status, total);
     await sleep(5000);
-  }
-  while(!syncCompleted)
-
-
+  } while (!syncCompleted);
 }
 
 async function create(configRepos: ConfigRepository[]) {
-   
-
   let idProvider = await getGitSourcesList(defaultGitSource);
-  
-  if(idProvider) {
-    console.log('Removing IdProvider ' + idProvider);
+
+  if (idProvider) {
+    console.log("Removing IdProvider " + idProvider);
     await removeGitSource(idProvider);
-    console.log('Removed git source');
+    console.log("Removed git source");
   }
 
-  
-      console.log('Creating provider ' + defaultGitSource);
-      idProvider = await addGitSource(defaultGitSource);
-      
-    console.log("IdProvider created: " + idProvider);
-    
-    const images = await getAllContainerImages();
+  console.log("Creating provider " + defaultGitSource);
+  idProvider = await addGitSource(defaultGitSource);
 
-    configRepos.forEach(async configRepo => {
-      console.log('Adding repo: ' + configRepo.url);
-      const repoId = await addRepo(configRepo.url, idProvider);
-      console.log('Added repo: ' + repoId);
+  console.log("IdProvider created: " + idProvider);
 
-      images.containerImages?.nodes.forEach(async image =>  {
-          if(configRepo.syncs.includes(image.name)) {
-              console.log('Enabling Repo Sync: ' + image.name);
-              const syncId = await enableContainerSync(image.id, repoId);
-              await addContainerSyncSchedule(syncId);
-          }
-      });
+  if(process.env.PAT_TOKEN) {
+    await addCredential(idProvider, process.env.PAT_TOKEN);
+  }
+  const images = await getAllContainerImages();
 
-      console.log('Repo Sync completed for ' + configRepo.url);
+  configRepos.forEach(async (configRepo) => {
+    console.log("Adding repo: " + configRepo.url);
+    const repoId = await addRepo(configRepo.url, idProvider);
+    console.log("Added repo: " + repoId);
+
+    images.containerImages?.nodes.forEach(async (image) => {
+      if (configRepo.syncs.includes(image.name)) {
+        console.log("Enabling Repo Sync: " + image.name);
+        const syncId = await enableContainerSync(image.id, repoId);
+        await addContainerSyncSchedule(syncId);
+      }
     });
-    
 
+    console.log("Repo Sync completed for " + configRepo.url);
+  });
 }
 
-async function getGitSourcesList(searchCriteria: string): Promise<UUID | undefined> {
+async function getGitSourcesList(
+  searchCriteria: string
+): Promise<UUID | undefined> {
   const variables = {
     search: searchCriteria,
     first: 5,
@@ -131,28 +134,27 @@ async function getGitSourcesList(searchCriteria: string): Promise<UUID | undefin
 //   console.log(data);
 // }
 
-async function getContainerSyncs() : Promise<GetContainerSyncsQuery> {
-    const variables = {
-        id: undefined,
-        search: '',
-        first: 5,
-        offset: 0,
-      };
-    
-      const result = await graphQLClient.request<GetContainerSyncsQuery>(
-        GET_CONTAINER_SYNCS,
-        variables
-      );
-      return result;
+async function getContainerSyncs(): Promise<GetContainerSyncsQuery> {
+  const variables = {
+    id: undefined,
+    search: "",
+    first: 5,
+    offset: 0,
+  };
+
+  const result = await graphQLClient.request<GetContainerSyncsQuery>(
+    GET_CONTAINER_SYNCS,
+    variables
+  );
+  return result;
 }
 
-async function getAllContainerImages() : Promise<GetAllContainerImagesQuery> {
-      const result = await graphQLClient.request<GetAllContainerImagesQuery>(
-        GET_ALL_CONTAINER_IMAGES,
-      );
-      return result;
+async function getAllContainerImages(): Promise<GetAllContainerImagesQuery> {
+  const result = await graphQLClient.request<GetAllContainerImagesQuery>(
+    GET_ALL_CONTAINER_IMAGES
+  );
+  return result;
 }
-
 
 async function enableContainerSyncForAll(imageId: string, providerId: string) {
   const variables = {
@@ -167,20 +169,23 @@ async function enableContainerSyncForAll(imageId: string, providerId: string) {
   console.log(result);
 }
 
-async function enableContainerSync(imageId: UUID, repoId: UUID | undefined) : Promise<UUID | undefined>{
-    const variables = {
-      imageId: imageId,
-      repoId: repoId,
-    };
-  
-    const result = await graphQLClient.request<EnableContainerSyncMutation>(
-      ENABLE_CONTAINER_SYNC,
-      variables
-    );
-    // console.log(result);
+async function enableContainerSync(
+  imageId: UUID,
+  repoId: UUID | undefined
+): Promise<UUID | undefined> {
+  const variables = {
+    imageId: imageId,
+    repoId: repoId,
+  };
 
-    return result.createContainerSync?.containerSync?.id
-  }
+  const result = await graphQLClient.request<EnableContainerSyncMutation>(
+    ENABLE_CONTAINER_SYNC,
+    variables
+  );
+  // console.log(result);
+
+  return result.createContainerSync?.containerSync?.id;
+}
 
 async function addContainerSyncSchedule(syncId: UUID | undefined) {
   const variables = {
@@ -207,7 +212,10 @@ async function syncNowContainer() {
   console.log(data);
 }
 
-async function addRepo(repoUrl: string, idProvider: UUID | undefined) : Promise<UUID | undefined> {
+async function addRepo(
+  repoUrl: string,
+  idProvider: UUID | undefined
+): Promise<UUID | undefined> {
   const variables = {
     repo: repoUrl,
     idProvider: idProvider,
@@ -221,7 +229,7 @@ async function addRepo(repoUrl: string, idProvider: UUID | undefined) : Promise<
   return result.createRepo?.repo?.id;
 }
 
-async function addGitSource(sourceName: string) : Promise<UUID | undefined> {
+async function addGitSource(sourceName: string): Promise<UUID | undefined> {
   const variables = {
     name: sourceName,
     vendor: "github",
@@ -237,32 +245,40 @@ async function addGitSource(sourceName: string) : Promise<UUID | undefined> {
   return result.createProvider?.provider?.id;
 }
 
-async function getReposStatus() : Promise<GetReposStatusQuery> {
-
-  const result = await graphQLClient.request<GetReposStatusQuery>(GET_REPOS_STATUS);
+async function getReposStatus(): Promise<GetReposStatusQuery> {
+  const result = await graphQLClient.request<GetReposStatusQuery>(
+    GET_REPOS_STATUS
+  );
   return result;
 }
 
-async function checkSyncCompleted(statusResult: GetReposStatusQuery, total: number) {
-    if (!statusResult.repos) {
+async function checkSyncCompleted(
+  statusResult: GetReposStatusQuery,
+  total: number
+) {
+  if (!statusResult.repos) {
+    return false;
+  }
+
+  const nodes = statusResult.repos.nodes;
+  if (
+    !nodes ||
+    nodes.length !== statusResult.repos.totalCount ||
+    nodes.length !== total
+  ) {
+    return false;
+  }
+
+  for (const node of nodes) {
+    if (!node.stats || node.stats.last_sync_time === null) {
       return false;
     }
-  
-    const nodes = statusResult.repos.nodes;
-    if (!nodes || nodes.length !== statusResult.repos.totalCount || nodes.length !== total) {
-      return false;
-    }
-  
-    for (const node of nodes) {
-      if (!node.stats || node.stats.last_sync_time === null) {
-        return false;
-      }
-    }
-  
-    return true;
+  }
+
+  return true;
 }
 
-async function removeGitSource(idProvider: UUID) : Promise<boolean> {
+async function removeGitSource(idProvider: UUID): Promise<boolean> {
   const variables = {
     idProvider: idProvider,
   };
@@ -275,8 +291,21 @@ async function removeGitSource(idProvider: UUID) : Promise<boolean> {
   return true;
 }
 
+async function addCredential(idProvider: UUID | undefined, token: string): Promise<boolean> {
+  const variables = {
+    provider: idProvider,
+    token: token,
+    type: "GITHUB_PAT",
+    username: "github",
+  };
+
+  const result = await graphQLClient.request(ADD_CREDENTIAL, variables);
+
+  return true;
+}
+
 async function sleep(ms: number): Promise<void> {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 console.log("start script");

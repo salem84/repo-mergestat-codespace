@@ -1,12 +1,12 @@
 {
     "repositories": [
         {
-            "url": "https://github.com/DotNetCodeIT/spid-dotnet-sdk",
-            "syncs": [ "Git Commits", "Git Files" ]
+            "url": "https://github.com/salem84/AspNetCore.VersionInfo",
+            "syncs": [ "Git Commits", "Git Files", "GitHub Issues", "GitHub Pull Requests" ]
         },
         {
             "url": "https://github.com/xmasdev-2022/xmaze-api",
-            "syncs": [ "Git Files"]
+            "syncs": [ "Git Files", "GitHub Pull Requests"]
         } 
     ]
 }
