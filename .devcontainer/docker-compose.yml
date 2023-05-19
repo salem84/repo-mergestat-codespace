@@ -39,11 +39,11 @@ services:
     depends_on:
       - postgres
     restart: unless-stopped
-    volumes:
-      - grafana_lib:/var/lib/grafana
-      - grafana_etc:/etc/grafana
-      - grafana_log:/var/log/grafana
-      - ./scripts/grafana/grafana.ini:/etc/grafana/grafana.ini
+    # volumes:
+    #   - grafana_lib:/var/lib/grafana
+    #   - grafana_etc:/etc/grafana
+    #   - grafana_log:/var/log/grafana
+    #   - ./scripts/grafana/grafana.ini:/etc/grafana/grafana.ini
     #   - ./scripts/grafana/provisioning:/etc/grafana/provisioning
     #   - ./examples:/var/lib/examples
     #   - /var/lib/grafana/dashboards/
