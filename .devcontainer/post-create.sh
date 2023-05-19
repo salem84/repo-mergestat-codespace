@@ -2,7 +2,7 @@
 workflow_name="Run Analysis"
 
 # Set the variable with the path to the pg_isready command
-PG_ISREADY_CMD="/usr/bin/pg_isready"
+PG_ISREADY_CMD="/usr/bin/pg_isready -h postgres"
 # Set the maximum number of retries for check postgres
 MAX_RETRIES=10
 # Set the delay between retries (in seconds) for check postgres
