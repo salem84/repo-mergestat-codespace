@@ -36,20 +36,20 @@ services:
       PGDATABASE: mergestat
     ports:
       - 3000:3000
-  #   depends_on:
-  #     - postgres
-  #   restart: always
+    depends_on:
+      - postgres
+    restart: unless-stopped
     volumes:
       - grafana_lib:/var/lib/grafana
       - grafana_etc:/etc/grafana
       - grafana_log:/var/log/grafana
-  #     - ./scripts/grafana/grafana.ini:/etc/grafana/grafana.ini
-  #     - ./scripts/grafana/provisioning:/etc/grafana/provisioning
-  #     - ./examples:/var/lib/examples
-  #     - /var/lib/grafana/dashboards/
-  #   entrypoint: [ "bash" ]
-  #   command: > # This is to set the datasource id in the examples to the datasource created for local grafana
-  #     -cx 'cp -r /var/lib/examples/* /var/lib/grafana/dashboards/ && find /var/lib/grafana/dashboards/ -name ''*.json'' | xargs grep -rnl "$${DS_POSTGRES}" | xargs -i@ sed -i "s/\$${DS_POSTGRES}/SXQZgpP7z/g" @ && exec grafana-server --config="/etc/grafana/grafana.ini"'
+      - ./scripts/grafana/grafana.ini:/etc/grafana/grafana.ini
+      - ./scripts/grafana/provisioning:/etc/grafana/provisioning
+      - ./examples:/var/lib/examples
+      - /var/lib/grafana/dashboards/
+    entrypoint: [ "bash" ]
+    command: > # This is to set the datasource id in the examples to the datasource created for local grafana
+      -cx 'cp -r /var/lib/examples/* /var/lib/grafana/dashboards/ && find /var/lib/grafana/dashboards/ -name ''*.json'' | xargs grep -rnl "$${DS_POSTGRES}" | xargs -i@ sed -i "s/\$${DS_POSTGRES}/SXQZgpP7z/g" @ && exec grafana-server --config="/etc/grafana/grafana.ini"'
 
 volumes:
   postgres-data:
