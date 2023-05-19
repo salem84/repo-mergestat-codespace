@@ -20,21 +20,33 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
 
+  grafana:
+    image: grafana/grafana-oss:latest
+    user: root
+    environment:
+      PGHOST: postgres
+      PGUSER: postgres
+      PGPASSWORD: postgres
+      PGDATABASE: mergestat
+    ports:
+      - 3000:3000
+    depends_on:
+      - postgres
+    restart: always
+    volumes:
+      - grafana_lib:/var/lib/grafana
+      - grafana_etc:/etc/grafana
+      - grafana_log:/var/log/grafana
+      - ./scripts/grafana/grafana.ini:/etc/grafana/grafana.ini
+      - ./scripts/grafana/provisioning:/etc/grafana/provisioning
+      - ./examples:/var/lib/examples
+      - /var/lib/grafana/dashboards/
+    entrypoint: [ "bash" ]
+    command: > # This is to set the datasource id in the examples to the datasource created for local grafana
+      -cx 'cp -r /var/lib/examples/* /var/lib/grafana/dashboards/ && find /var/lib/grafana/dashboards/ -name ''*.json'' | xargs grep -rnl "$${DS_POSTGRES}" | xargs -i@ sed -i "s/\$${DS_POSTGRES}/SXQZgpP7z/g" @ && exec grafana-server --config="/etc/grafana/grafana.ini"'
+
 volumes:
   postgres-data:
-
-# version: '3'
-# services:
-#   postgres:
-#     image: 'postgres:14'
-#     environment:
-#       - 'POSTGRES_HOST_AUTH_METHOD=trust'
-#     expose: 
-#       - '5432'
-#     ports: # expose port to host machine in case we want to use external db gui tools
-#       - '5432:5432'
-#     volumes:
-#       - 'database:/var/lib/postgresql/data'
-
-# volumes:
-#   database
+  grafana_lib:
+  grafana_etc:
+  grafana_log:
