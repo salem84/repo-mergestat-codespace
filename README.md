@@ -9,25 +9,27 @@
 
 ## TL;DR
 
-### What I built 
+### Intro
+
+#### What I built 
 I have developed a solution that enables easy integration of the [Mergestat](https://www.mergestat.com/) within GitHub Codespace. With this integration, users can now seamlessly utilize Mergestat to analyze and track GitHub repositories using SQL queries, without needing to install any tools.
 Furthermore, by leveraging GitHub Actions workflows, all the needed data can be collected automatically using scheduled workflows, thereby reducing information gathering times.
 
-### Category Submission: 
+#### Category Submission: 
 __Maintainer Must-Haves:__ Make the lives of Open Source maintainers easier.
 > _Guidance:_ Developers can use Codespaces to set up an environment to triage issues and review pull requests. Actions can also be used to build tools and resources to help developers create better documentation.
 
-### Permissive License 
+#### Permissive License 
 [MIT License](https://github.com/salem84/repo-mergestat-codespace/blob/main/LICENSE)
 
-### Background (What made you decide to build this particular app? What inspired you?) 
+#### Background (What made you decide to build this particular app? What inspired you?) 
 My objective in developing these extensions was to create a simple and efficient system for analyzing repositories, which can be easily implemented within one's own GitHub organization. By doing so, users can benefit from quick and accurate insights into their repositories, streamlining their development process and improving overall productivity using open-source tools.
 
-### How I built it (How did you utilize GitHub Actions or GitHub Codespaces? Did you learn something new along the way? Pick up a new skill?) 
+#### How I built it (How did you utilize GitHub Actions or GitHub Codespaces? Did you learn something new along the way? Pick up a new skill?) 
 
 To build this solution, I utilized both GitHub Actions and GitHub Codespaces. Specifically, I created a custom GitHub Actions workflow for data collection, and I configured a GitHub Codespace to execute queries. Along the way, I learned a lot about both tools and discovered new ways to use GitHub Actions in contexts outside of traditional CI/CD pipelines. Moreover, diving into the world of GitHub Codespaces was an eye-opening experience that allowed me to gain a deeper understanding of the platform's capabilities. In my upcoming detailed post, I'll share screenshots and code to describe each step of the process in more detail.
 
-### What is MergeStat
+#### What is MergeStat
 MergeStat is a powerful tool that allows developers to track and analyze data in git repositories and related sources (such as the GitHub API). 
 Using MergeStat, users can gain valuable insights into their codebase and monitor key metrics using SQL queries to extract relevant data from GitHub repositories, and presents the information also in a user-friendly dashboard, making it easy for developers to identify and address issues in their code. 
 
@@ -97,7 +99,7 @@ The only challenging part was finding a way to instruct Mergestat to index the s
 
 Let's take it step by step.
 
-### Startup containers and install requirements
+#### Startup containers and install requirements
 
 The first step is to download the source code and start all the required containers for mergestat using docker compose. To do this, I used the YAML script available on the mergestat website, removed the container for the graphical interface, and, most importantly, simplified the authentication process towards the GraphQL API by modifying the default_role of the _Graphile Engine_. This way, all API calls, even those not authenticated, will use the admin role, and it will be possible to bypass the authentication call... There might have been other ways, but for the project's purposes, this seemed to be the quickest and safest approach.
 
@@ -105,7 +107,7 @@ I had also started to figure out how to apply [GitHub Services Container](https:
 
 After that, I set up the environment for _Node.js_, installed the necessary packages, and started compiling the _TypeScript_ scripts.
 
-### Preparation script to indexing repository
+#### Preparation script to indexing repository
 
 For the writing of this script, I had mainly two options: either to understand the internal details of the database and write the appropriate SQL queries to insert the data, or alternatively, to use the same APIs that are used by the web portal.
 
@@ -171,7 +173,7 @@ where there is:
 
 However, I would like to integrate in the next few days the association of a _GitHub Personal Access Token (PAT)_ to enable all possible types of indexing 💡.
 
-### Workflow final steps
+#### Workflow final steps
 The last step is to export the database and upload it as an artifact on GitHub. In this case too, there were many ways to perform the dump... from using GitHub Actions available on the Marketplace or using command line and exporting plain scripts or gzip compressed tarballs. I chose to use pg_dump which is directly available inside the PostgreSQL container and export a dump in custom archive compressed mode.
 
 ```
@@ -187,7 +189,7 @@ In conclusion, we upload the artifact to GitHub and shut down all the containers
 ### What is GitHub Codespaces?
 GitHub Codespaces provides developers with a cloud-based development environment, allowing for faster onboarding, coding on any device, and maintaining consistency across environments. Its user interface resembles popular IDEs such as Visual Studio Code, but it operates directly within your web browser. To tailor your project to GitHub Codespaces, you can create custom configuration files that ensure a consistent setup for all project users.
 
-### Starting with DevContainers
+#### Starting with DevContainers
 The first thing we're going to configure is **DevContainers** feature. What is it?
 
 DevContainers is a feature of Visual Studio Code that allows you to define and configure containerized development environments. With DevContainers, you can specify all the dependencies, tools, and settings required for the development environment within a configuration file, known as `devcontainer.json`. 
@@ -260,7 +262,7 @@ Let's analyze the individual sections of the file in detail:
 - **initializeCommand/postCreateCommand**: Specifies a command that should be executed when the Codespace is initialized and after the container is created. This is used to prepare the environment as explained in greater detail in the following sections.
 
 
-### Docker-compose configuration
+#### Docker-compose configuration
 In our docker-compose file, we currently have two containers:
 
 1. The _"postgres"_ container: This container is responsible for starting the PostgreSQL database. It provides the necessary environment for running and managing the database.
@@ -274,14 +276,14 @@ Additionally, in the _.devcontainer_ configuration, we privately expose port 543
 
 ![codespace-ports](./images/codespace-ports.png)
 
-### Features & VSCode Customization
+#### Features & VSCode Customization
 
 With just a few lines of code, we can customize our environment in the following ways:
 - Installing the GitHub CLI
 - Installing VSCode extensions for interacting with the database
 - Initializing the default database connection
 
-### Bash Scripts for Codespace Configuration
+#### Bash Scripts for Codespace Configuration
 
 We have two scripts executed at different times. The first script, `init.sh`, is executed before initialization and simply creates the folder where the database will be stored. In reality, this step could be skipped, but it helped me understand the Codespace lifecycle better.
 
