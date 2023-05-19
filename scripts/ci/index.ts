@@ -31,12 +31,14 @@ import {
 import { UUID } from "crypto";
 import { ConfigReader, ConfigRepository, ConfigRoot } from "./configuration";
 
+// only for debug test
 const defaultEndpoint = `https://salem84-orange-parakeet-rrww9ppqxhwwpg-5433.preview.app.github.dev/graphql`;
 const defaultGitSource = "ReposCI";
 
 let graphQLClient: GraphQLClient;
 
 async function main() {
+  // Read parameters from env variables
   let configPath = process.env.CONFIG_PATH;
 
   if (!configPath) {
@@ -51,10 +53,14 @@ async function main() {
   if (!endpoint) {
     endpoint = defaultEndpoint;
   }
+
+  // Create GraphQL client
   graphQLClient = new GraphQLClient(endpoint);
 
+  // Create repositories using configuration file
   await create(config.repositories);
 
+  // Wait until sync is completed
   let syncCompleted = false;
   const total = config.repositories.length;
   do {
@@ -270,7 +276,7 @@ async function checkSyncCompleted(
   }
 
   for (const node of nodes) {
-    if (!node.stats || node.stats.last_sync_time === null) {
+    if (!node.stats || node.stats.last_sync_time === null || (node.stats.success + node.stats.warning + node.stats.error >= node.stats.sync_count) ) {
       return false;
     }
   }
@@ -308,6 +314,7 @@ async function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+// ----------------------------------- ENTRYPOINT -----------------------------------
 console.log("start script");
 
 main()
