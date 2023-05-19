@@ -20,23 +20,23 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
 
-  # grafana:
-  #   image: grafana/grafana-oss:latest
-  #   user: root
-  #   environment:
-  #     PGHOST: postgres
-  #     PGUSER: postgres
-  #     PGPASSWORD: postgres
-  #     PGDATABASE: mergestat
-  #   ports:
-  #     - 3000:3000
+  grafana:
+    image: grafana/grafana-oss:latest
+    user: root
+    environment:
+      PGHOST: postgres
+      PGUSER: postgres
+      PGPASSWORD: postgres
+      PGDATABASE: mergestat
+    ports:
+      - 3000:3000
   #   depends_on:
   #     - postgres
   #   restart: always
-  #   volumes:
-  #     - grafana_lib:/var/lib/grafana
-  #     - grafana_etc:/etc/grafana
-  #     - grafana_log:/var/log/grafana
+    volumes:
+      - grafana_lib:/var/lib/grafana
+      - grafana_etc:/etc/grafana
+      - grafana_log:/var/log/grafana
   #     - ./scripts/grafana/grafana.ini:/etc/grafana/grafana.ini
   #     - ./scripts/grafana/provisioning:/etc/grafana/provisioning
   #     - ./examples:/var/lib/examples
