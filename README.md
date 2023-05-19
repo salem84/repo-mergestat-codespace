@@ -1,7 +1,11 @@
 # Boost Your Repository Insights with GitHub Actions 🚀, Codespace 💻 and Mergestat 🔎📙
 
 ## Quickstart
-....
+1. Fork this repository
+1. Change repositories URL and configuration in `config.json`
+1. Execute `Run Analysis` workflow or alternatively configure it for scheduled execution or event-triggered execution
+1. Create your GitHub Codespace: it will be automatically configured with all the necessary tools
+1. Open an existing SQL query or create your own and execute it directly within Codespace.
 
 ## TL;DR
 
@@ -37,7 +41,7 @@ On the other hand, Mergestat Full has a worker process that analyzes the reposit
 
 Although my initial plan for [#GitHubHack23](https://dev.to/devteam/announcing-the-github-dev-2023-hackathon-4ocn) challenge was to use Mergestat Lite to analyze the repository where the workflow was launched, perform the analysis and create an issue via the GitHub API to summarize all the information collected using the `mergestat summarize commits` [command](https://docs.mergestat.com/mergestat-lite/usage/summarize-commits):
 
-![mergestat summarize commits](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/gjms4ho382rfbimub9il.png)
+![mergestat summarize commits](./images/mergestat-summarize-commits.png)
 
 I eventually chose to pursue a more complex solution!
 Despite being more challenging, I believed that this approach would be more versatile and capable of fully utilizing the potential of the tools available on GitHub 💪! 
@@ -179,3 +183,141 @@ where:
 - `-Z 9`: maximum compression
 
 In conclusion, we upload the artifact to GitHub and shut down all the containers.
+
+### What is GitHub Codespaces?
+GitHub Codespaces provides developers with a cloud-based development environment, allowing for faster onboarding, coding on any device, and maintaining consistency across environments. Its user interface resembles popular IDEs such as Visual Studio Code, but it operates directly within your web browser. To tailor your project to GitHub Codespaces, you can create custom configuration files that ensure a consistent setup for all project users.
+
+### Starting with DevContainers
+The first thing we're going to configure is **DevContainers** feature. What is it?
+
+DevContainers is a feature of Visual Studio Code that allows you to define and configure containerized development environments. With DevContainers, you can specify all the dependencies, tools, and settings required for the development environment within a configuration file, known as `devcontainer.json`. 
+When you open Codespace with DevContainers configuration, it automatically starts a Docker container with all the preconfigured necessary resources, providing a consistent and isolated development environment. 
+This is particularly useful for ensuring that all team members have the same configuration and dependencies, facilitating collaboration and quick project startup.
+
+![DevContainers-architecture](./images/devContainers-architecture.png)
+
+In our case, I have created a `devcontainer.json` file inside the `.devcontainer` folder with the following configuration:
+
+```json
+{
+  "name": "Mergestat Codespace Project",
+  "dockerComposeFile": "docker-compose.yml",
+  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+  "service": "app",
+  "remoteUser": "vscode",
+  
+  // Configure tool-specific properties.
+  "features": {
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+  "customizations": {
+    "codespaces": {
+      "openFiles": [
+        "README.md"
+      ]
+    },
+    "vscode": {
+      "extensions": [
+        "mtxr.sqltools",
+        "mtxr.sqltools-driver-pg"
+      ],
+      "settings": {
+        "sqltools.connections": [
+          {
+            "previewLimit": 50,
+            "server": "postgres",
+            "port": 5432,
+            "driver": "PostgreSQL",
+            "name": "mergestat",
+            "database": "mergestat",
+            "username": "postgres",
+            "password": "postgres"
+          }
+        ]
+      }
+    }
+  },
+
+  // Use 'forwardPorts' to make a list of ports inside the container available locally.
+  // This can be used to network with other containers or the host.
+  "forwardPorts": [5432],
+
+  "initializeCommand": ".devcontainer/init.sh",
+  // Use 'postCreateCommand' to run commands after the container is created.
+  "postCreateCommand": ".devcontainer/post-create.sh"
+}
+```
+
+Let's analyze the individual sections of the file in detail:
+
+- **name**: Specifies the name of the DevContainer configuration.
+- **dockerFile**: Specifies the path to the Dockerfile/DockerCompose used to build the container image.
+- **customizations"/codespaces/openFiles**: to open automatically the README file.
+- **customizations/vscode/extensions**: Lists the Visual Studio Code extensions that should be installed.
+- **customizations/vscode/settings**: Specifies custom Visual Studio Code settings that should be applied when working in the DevContainer. These settings can include editor preferences, formatting options, and more.
+- **forwardPorts**: Lists the ports that should be forwarded in Codespace to test and debug your application. 
+
+- **initializeCommand/postCreateCommand**: Specifies a command that should be executed when the Codespace is initialized and after the container is created. This is used to prepare the environment as explained in greater detail in the following sections.
+
+
+### Docker-compose configuration
+In our docker-compose file, we currently have two containers:
+
+1. The _"postgres"_ container: This container is responsible for starting the PostgreSQL database. It provides the necessary environment for running and managing the database.
+
+1. The _"app"_ container: This is the main container, built from the Dockerfile. It installs the PostgreSQL tools and will be used to restore the database.
+
+![Codespace-startup](./images/codespace-startup.png)
+
+Additionally, in the _.devcontainer_ configuration, we privately expose port 5432 of the "postgres" container using "forwardPorts". This allows us to access the PostgreSQL database running inside the container from the local machine.
+
+
+![codespace-ports](./images/codespace-ports.png)
+
+### Features & VSCode Customization
+
+With just a few lines of code, we can customize our environment in the following ways:
+- Installing the GitHub CLI
+- Installing VSCode extensions for interacting with the database
+- Initializing the default database connection
+
+### Bash Scripts for Codespace Configuration
+
+We have two scripts executed at different times. The first script, `init.sh`, is executed before initialization and simply creates the folder where the database will be stored. In reality, this step could be skipped, but it helped me understand the Codespace lifecycle better.
+
+The second script `post-create.sh` is the more important one. It is executed after initialization and performs essential configurations and setup tasks to ensure the environment is fully prepared.
+
+Let's analyze the script:
+
+```sh
+#!/bin/bash
+workflow_name="Run Analysis"
+
+echo "Get info on latest GitHub Actions run..."
+run_id=$(gh run list -w "$workflow_name" -L 1 --json databaseId | jq '.[]| .databaseId')
+
+echo "GitHub Actions latest runId: $run_id"
+
+echo "Download artifacts..."
+gh run download $run_id -D $(pwd)/pgdata
+```
+
+The first part retrieves the artifacts associated with the latest execution of the "Run Analysis" workflow using the GitHub CLI. The artifact is then deposited into a temporary folder.
+
+---
+
+```sh
+echo "Starting database restore..."
+touch ~/.pgpass
+echo "postgres:5432:mergestat:postgres:postgres" > ~/.pgpass
+chmod 0600 ~/.pgpass
+
+pg_restore -h postgres -U postgres -d mergestat --clean -x --no-owner $(pwd)/pgdata/pg-dump/backup_mergestat.dump 
+```
+
+
+To ensure proper execution of the bash scripts, it is essential to grant the execution permissions using the `chmod +x` command. This command allows the scripts to be run as executable files and can be executed directly inside Codespace and then committed to repository.
+
+Our Codespace will be:
+
+![codespace-withquery](./images/codespace-withquery.png)
