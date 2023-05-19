@@ -276,7 +276,11 @@ async function checkSyncCompleted(
   }
 
   for (const node of nodes) {
-    if (!node.stats || node.stats.last_sync_time === null || (node.stats.success + node.stats.warning + node.stats.error >= node.stats.sync_count) ) {
+    if (!node.stats || node.stats.last_sync_time === null) {
+      return false;
+    }
+
+    if (node.stats.success + node.stats.warning + node.stats.error < node.stats.sync_count) {
       return false;
     }
   }
