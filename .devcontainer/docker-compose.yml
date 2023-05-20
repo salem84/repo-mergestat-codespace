@@ -29,9 +29,9 @@ services:
   grafana:
     image: grafana/grafana-oss:latest
     environment:
-      GF_AUTH_ANONYMOUS_ORG_ROLE: Admin
-      GF_AUTH_ANONYMOUS_ENABLED: true
-      GF_AUTH_BASIC_ENABLED: false
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_BASIC_ENABLED=false
     ports:
       - 3000:3000
     depends_on:
