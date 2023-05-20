@@ -5,7 +5,8 @@
 1. Change repositories URL and configuration in `config.json`
 1. Execute `Run Analysis` workflow or alternatively configure it for scheduled execution or event-triggered execution
 1. Create your GitHub Codespace: it will be automatically configured with all the necessary tools
-1. Open an existing SQL query or create your own and execute it directly within Codespace.
+1. Open an existing SQL query or create your own and execute it directly within Codespace using SQL Tools
+1. Open Grafana (using Codespace Port tab) to view preloaded dashboards
 
 ## TL;DR
 

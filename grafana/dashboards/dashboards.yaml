@@ -1,0 +1,9 @@
+apiVersion: 1
+
+providers:
+  - name: 'MergeStat'
+    type: file
+    allowUiUpdates: true
+    options:
+      path: /etc/grafana/provisioning/dashboards
+      foldersFromFilesStructure: true
